@@ -1,5 +1,5 @@
 {
-	"name": "expense-ledger-bot",
+	"name": "expense-ledger-tg-bot",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
