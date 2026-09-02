@@ -11,8 +11,23 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { handleTelegramWebhook } from './routes/telegram'
+
+export interface Env {
+	BOT_TOKEN: string
+	BOT_INFO: string
+}
+
 export default {
-	async fetch(request, env, ctx): Promise<Response> {
-		return new Response("Hello World!");
+	async fetch(request: Request, env, ctx: ExecutionContext): Promise<Response> {
+		const url = new URL(request.url)
+
+		// console.log(url)
+
+		if (url.pathname === '/telegram') {
+			handleTelegramWebhook(request, env)
+		}
+
+		return new Response("Request doesn't match any existing route")
 	},
-} satisfies ExportedHandler<Env>;
+} satisfies ExportedHandler<Env>
