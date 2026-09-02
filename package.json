@@ -1,5 +1,5 @@
 {
-	"name": "young-snow-c62e",
+	"name": "expense-ledger-bot",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
@@ -14,5 +14,8 @@
 		"typescript": "^5.5.2",
 		"vitest": "~4.1.0",
 		"wrangler": "^4"
+	},
+	"dependencies": {
+		"grammy": "^1.46.0"
 	}
 }
