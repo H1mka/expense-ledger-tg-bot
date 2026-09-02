@@ -12,7 +12,7 @@
  */
 
 import { handleTelegramWebhook } from './routes/telegram'
-import { UserFromGetMe } from 'grammy/types'
+import type { UserFromGetMe } from 'grammy/types'
 
 export interface Env {
 	BOT_TOKEN: string
@@ -26,9 +26,9 @@ export default {
 		// console.log(url)
 
 		if (url.pathname === '/telegram') {
-			handleTelegramWebhook(request, env)
+			return handleTelegramWebhook(request, env)
 		}
 
-		return new Response("Request doesn't match any existing route")
+		return new Response("Request doesn't match any existing route", { status: 404 })
 	},
 } satisfies ExportedHandler<Env>
