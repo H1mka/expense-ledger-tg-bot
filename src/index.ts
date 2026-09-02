@@ -21,10 +21,11 @@ export interface Env {
 export default {
 	async fetch(request: Request, env, ctx: ExecutionContext): Promise<Response> {
 		const url = new URL(request.url)
-
+		console.log('\n\n\n\n\n REQUEST', request, '\n\n\n\n\n')
 		// console.log(url)
 
 		if (url.pathname === '/telegram') {
+			console.log('TG')
 			handleTelegramWebhook(request, env)
 		}
 

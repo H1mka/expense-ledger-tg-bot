@@ -3,6 +3,7 @@ import { Env } from '../index'
 import { registerCommands } from './commands/registerCommands'
 
 export const createBot = (env: Env) => {
+	console.log('createBot BOT', env)
 	const bot = new Bot(env.BOT_TOKEN, { botInfo: JSON.parse(env.BOT_INFO) })
 
 	registerCommands(bot)
