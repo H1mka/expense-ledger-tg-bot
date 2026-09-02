@@ -12,20 +12,20 @@
  */
 
 import { handleTelegramWebhook } from './routes/telegram'
+import { UserFromGetMe } from 'grammy/types'
 
 export interface Env {
 	BOT_TOKEN: string
-	BOT_INFO: string
+	BOT_INFO: UserFromGetMe
 }
 
 export default {
 	async fetch(request: Request, env, ctx: ExecutionContext): Promise<Response> {
 		const url = new URL(request.url)
-		console.log('\n\n\n\n\n REQUEST', request, '\n\n\n\n\n')
+		console.log('\n\n\n\n\n REQUEST', JSON.stringify(request), '\n\n\n\n\n')
 		// console.log(url)
 
 		if (url.pathname === '/telegram') {
-			console.log('TG')
 			handleTelegramWebhook(request, env)
 		}
 
