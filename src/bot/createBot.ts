@@ -1,6 +1,9 @@
 import { Bot } from 'grammy'
 import { Env } from '../index'
+
+// Event registration helpers
 import { registerCommands } from './commands/registerCommands'
+import { registerHandlers } from './handlers/registerHandlers'
 
 export const createBot = (env: Env) => {
 	console.log('2. === Create bot ===')
@@ -9,5 +12,7 @@ export const createBot = (env: Env) => {
 	console.log('3. === Bot was created successfully ===')
 
 	registerCommands(bot)
+	registerHandlers(bot)
+
 	return bot
 }
