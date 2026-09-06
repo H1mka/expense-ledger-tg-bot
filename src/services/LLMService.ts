@@ -26,9 +26,10 @@ type TextParseOutput =
 			message: string
 			data: null
 	  }
+	| null
 
 type WorkersAiTextResponse = {
-	response?: string
+	response?: unknown
 }
 
 type WorkersAiMessage = {
@@ -42,34 +43,50 @@ export class LLMService {
 	async formatImageText(textFromImage: string | Array<string>): Promise<TextParseOutput> {
 		const stringifyText = JSON.stringify(textFromImage)
 
-		return this.generateJson<TextParseOutput>(formatTextFromImageRules, stringifyText)
+		return this.generateJson<NonNullable<TextParseOutput>>(formatTextFromImageRules, stringifyText)
 	}
 
 	async formatText(userText: string): Promise<TextParseOutput> {
-		return this.generateJson<TextParseOutput>(formatTextRules, userText)
+		return this.generateJson<NonNullable<TextParseOutput>>(formatTextRules, userText)
 	}
 
-	private async generateJson<T>(systemPrompt: string, userText: string): Promise<T> {
-		const messages: WorkersAiMessage[] = [
-			{ role: 'system', content: systemPrompt },
-			{ role: 'user', content: userText },
-		]
+	private async generateJson<T>(systemPrompt: string, userText: string): Promise<T | null> {
+		try {
+			const messages: WorkersAiMessage[] = [
+				{ role: 'system', content: systemPrompt },
+				{ role: 'user', content: userText },
+			]
 
-		const result = (await this.ai.run(LLM_MODEL, {
-			messages,
-			temperature: 0.1,
-			max_tokens: 1024,
-			response_format: { type: 'json_object' },
-		})) as WorkersAiTextResponse
+			const result = (await this.ai.run(LLM_MODEL, {
+				messages,
+				temperature: 0.1,
+				max_tokens: 1024,
+				response_format: { type: 'json_object' },
+			})) as WorkersAiTextResponse
 
-		if (!result.response) {
-			throw new Error('Workers AI returned an empty response')
+			const response = result.response ?? result
+			console.log(JSON.stringify(response), typeof response)
+
+			if (!response) {
+				throw new Error('Workers AI returned an empty response')
+			}
+
+			return this.parseJsonResponse<T>(response)
+		} catch (error) {
+			console.error('Error with LLM Service', error)
+			return null
+		}
+	}
+
+	private parseJsonResponse<T>(response: unknown): T {
+		if (typeof response === 'object' && response !== null) {
+			return response as T
 		}
 
-		return this.parseJsonResponse<T>(result.response)
-	}
+		if (typeof response !== 'string') {
+			throw new Error(`Workers AI response has unsupported type: ${typeof response}`)
+		}
 
-	private parseJsonResponse<T>(response: string): T {
 		try {
 			return JSON.parse(response) as T
 		} catch {
