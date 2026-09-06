@@ -6,6 +6,6 @@ import { Env } from '../../index'
 export const registerHandlers = (bot: Bot, env: Env) => {
 	console.log('=== Register event handlers ===')
 
-	handleTextMessages(bot)
+	handleTextMessages(bot, env)
 	registerPhotoHandler(bot, env)
 }
