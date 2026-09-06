@@ -15,20 +15,26 @@ const categoriesEnum = [
 const categoriesList = categoriesEnum.map((category) => `- ${category}`).join('\n')
 const fallbackCategory = categoriesEnum[categoriesEnum.length - 1]
 
-const outputJsonSchema = `
+const textOutputJsonSchema = `
 {
-  "date": "YYYY-MM-DD" | null,
-  "store": string | null,
-  "category": string | null,
-  "price": number | null,
-  "amount": number,
-  "currency": string | null,
-  "description": string | null,
-  "paymentMethod": string | null,
-  "confidence": number,
-  "missingFields": string[]
+  "success": boolean,
+  "message": string | null,
+  "data": {
+    "date": "YYYY-MM-DD" | null,
+    "store": string | null,
+    "category": string | null,
+    "price": number | null,
+    "amount": number,
+    "currency": string | null,
+    "description": string | null,
+    "paymentMethod": string | null,
+    "confidence": number,
+    "missingFields": string[]
+  } | null
 }
 `
+
+/** --- Format text from image rules --- */
 
 const formatTextFromImageRules = `
 You are an expense receipt parser.
@@ -43,6 +49,11 @@ ${categoriesList}
 Task:
 - Extract the main purchase information and return only one valid JSON object.
 - Do not return markdown, comments, explanations, or extra text.
+- If the OCR text contains enough information to create an expense record, return "success": true.
+- If the OCR text is not a receipt, is unreadable, or does not contain enough information, return "success": false.
+- "message" must explain briefly what is missing or why the receipt text cannot be parsed.
+- When "success" is true, "data" must contain the parsed expense object.
+- When "success" is false, "data" must be null.
 - If several purchased items are present, summarize them in "description".
 - Use the final paid total as "price", not VAT subtotal lines and not individual item prices.
 - Use ISO date format YYYY-MM-DD.
@@ -57,7 +68,7 @@ Task:
 - Add names of fields you could not reliably extract to "missingFields".
 
 Output JSON schema:
-${outputJsonSchema}
+${textOutputJsonSchema}
 
 Rules:
 - The JSON must be parseable by JSON.parse.
@@ -66,7 +77,11 @@ Rules:
 - Numbers must be JSON numbers, not strings.
 - If a field is unknown, use null and include the field name in "missingFields".
 - Keep "description" short and human-readable.
+- For successful parsing, set "message" to null.
+- For failed parsing, set "success" to false, "data" to null, and "message" to a short user-facing explanation.
 `
+
+/** --- Format text rules --- */
 
 const formatTextRules = `
 You are an expense text parser.
@@ -108,22 +123,7 @@ Expense data rules:
 - Add names of fields you could not reliably extract to "missingFields".
 
 Output JSON schema:
-{
-  "success": boolean,
-  "message": string | null,
-  "data": {
-    "date": "YYYY-MM-DD" | null,
-    "store": string | null,
-    "category": string | null,
-    "price": number | null,
-    "amount": number,
-    "currency": string | null,
-    "description": string | null,
-    "paymentMethod": string | null,
-    "confidence": number,
-    "missingFields": string[]
-  } | null
-}
+${textOutputJsonSchema}
 
 Rules:
 - The JSON must be parseable by JSON.parse.

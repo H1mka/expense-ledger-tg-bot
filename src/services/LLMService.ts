@@ -39,8 +39,10 @@ type WorkersAiMessage = {
 export class LLMService {
 	constructor(private readonly ai: Ai) {}
 
-	async formatImageText(textFromImage: string): Promise<ExpenseData> {
-		return this.generateJson<ExpenseData>(formatTextFromImageRules, textFromImage)
+	async formatImageText(textFromImage: string | Array<string>): Promise<TextParseOutput> {
+		const stringifyText = JSON.stringify(textFromImage)
+
+		return this.generateJson<TextParseOutput>(formatTextFromImageRules, stringifyText)
 	}
 
 	async formatText(userText: string): Promise<TextParseOutput> {
