@@ -204,7 +204,6 @@ Expense data rules:
 - Add names of fields you could not reliably extract to "missingFields".
 
 Output JSON schema:
-${textOutputJsonSchema}
 
 Rules:
 - The JSON must be parseable by JSON.parse.
