@@ -1,6 +1,9 @@
 import { Bot, Context } from 'grammy'
 import { Env } from '../../index'
+
+import { LLMService } from '../../services/LLMService'
 import { GoogleVisionService } from '../../services/GoogleVisionService'
+
 import { downloadTelegramPhoto, arrayBufferToBase64, type TelegramPhotoResult } from '../../utils/imageHelper'
 
 export const registerPhotoHandler = (bot: Bot, env: Env) => {
@@ -33,5 +36,16 @@ export const registerPhotoHandler = (bot: Bot, env: Env) => {
 		console.log('TEXT RECOGNIZE RESULT', JSON.stringify(textArray))
 		await ctx.reply(`TEXT RECOGNIZE RESULT $${JSON.stringify(textArray)}`)
 		// await ctx.replyWithPhoto(photo.file_id, { caption: 'This is your photo' })
+
+		// Text formatter with ai
+		const llmService = new LLMService(env.AI)
+		const response = await llmService.formatImageText(textArray)
+
+		if (!response.success) {
+			await ctx.reply(`⛔️ Something went wrong: ${JSON.stringify(response.message)}`)
+			return
+		}
+
+		await ctx.reply(`Json format ${JSON.stringify(response.data)}`)
 	})
 }
