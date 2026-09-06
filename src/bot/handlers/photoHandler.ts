@@ -1,6 +1,9 @@
 import { Bot, Context } from 'grammy'
+import { Env } from '../../index'
+import { GoogleVisionService } from '../../services/GoogleVisionService'
+import { downloadTelegramPhoto, arrayBufferToBase64, type TelegramPhotoResult } from '../../utils/imageHelper'
 
-export const registerPhotoHandler = (bot: Bot) => {
+export const registerPhotoHandler = (bot: Bot, env: Env) => {
 	console.log('=== Register photo handler ===')
 
 	bot.on('message:photo', async (ctx: Context) => {
@@ -13,6 +16,22 @@ export const registerPhotoHandler = (bot: Bot) => {
 			return
 		}
 
-		await ctx.replyWithPhoto(photo.file_id, { caption: 'This is your photo' })
+		// Get image in base64 format
+		const photoResponse: TelegramPhotoResult = await downloadTelegramPhoto(photo.file_id, env.BOT_TOKEN, ctx.api)
+		if (!photoResponse || typeof photoResponse === 'string' || !photoResponse.ok) {
+			await ctx.reply(`Image download failed ${photoResponse}`)
+			return
+		}
+
+		const buffer = await photoResponse.arrayBuffer()
+		const base64 = arrayBufferToBase64(buffer)
+		console.log('Image buffer length', base64.length)
+
+		// Get image recognize from Google Vision
+		const googleVision = new GoogleVisionService(env.GOOGLE_VISION_API_KEY)
+		const textArray = await googleVision.parseImageToText(base64)
+		console.log('TEXT RECOGNIZE RESULT', JSON.stringify(textArray))
+		await ctx.reply(`TEXT RECOGNIZE RESULT $${JSON.stringify(textArray)}`)
+		// await ctx.replyWithPhoto(photo.file_id, { caption: 'This is your photo' })
 	})
 }

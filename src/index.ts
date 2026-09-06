@@ -17,6 +17,8 @@ import type { UserFromGetMe } from 'grammy/types'
 export interface Env {
 	BOT_TOKEN: string
 	BOT_INFO: UserFromGetMe
+	GOOGLE_VISION_API_KEY: string
+	AI: Ai
 }
 
 export default {
