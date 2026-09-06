@@ -41,8 +41,8 @@ export const registerPhotoHandler = (bot: Bot, env: Env) => {
 		const llmService = new LLMService(env.AI)
 		const response = await llmService.formatImageText(textArray)
 
-		if (!response.success) {
-			await ctx.reply(`⛔️ Something went wrong: ${JSON.stringify(response.message)}`)
+		if (!response || !response.success) {
+			await ctx.reply(`⛔️ Something went wrong: ${JSON.stringify(response?.message)}`)
 			return
 		}
 
