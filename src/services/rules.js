@@ -120,6 +120,9 @@ Convert raw OCR receipt text into structured purchase data.
 Today's date:
 ${today}
 
+Available categories:
+${categoriesList}
+
 Rules:
 
 Extract the store name, transaction date, currency, payment method, final receipt total, and all purchased items.
