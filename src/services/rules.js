@@ -14,8 +14,84 @@ const categoriesEnum = [
 
 const categoriesList = categoriesEnum.map((category) => `- ${category}`).join('\n')
 const fallbackCategory = categoriesEnum[categoriesEnum.length - 1]
+const today = new Date()
 
-const textOutputJsonSchema = `
+const jsonSchema = {
+	type: 'object',
+	properties: {
+		success: {
+			type: 'boolean',
+		},
+		message: {
+			type: ['string', 'null'],
+		},
+		data: {
+			type: ['object', 'null'],
+			properties: {
+				store: {
+					type: ['string', 'null'],
+				},
+				date: {
+					type: 'string',
+				},
+				currency: {
+					type: ['string', 'null'],
+				},
+				paymentMethod: {
+					enum: ['Card', 'Cash', 'Bank Transfer', 'Voucher', null],
+				},
+				receiptTotal: {
+					type: ['number', 'null'],
+					minimum: 0,
+				},
+				items: {
+					type: 'array',
+					items: {
+						type: 'object',
+						properties: {
+							name: {
+								type: 'string',
+							},
+							quantity: {
+								type: 'number',
+								exclusiveMinimum: 0,
+							},
+							unitPrice: {
+								type: ['number', 'null'],
+								minimum: 0,
+							},
+							category: {
+								type: 'string',
+								enum: categoriesEnum,
+							},
+						},
+						required: ['name', 'quantity', 'unitPrice', 'category'],
+						additionalProperties: false,
+					},
+				},
+			},
+			required: ['store', 'date', 'currency', 'paymentMethod', 'receiptTotal', 'items'],
+			additionalProperties: false,
+		},
+		missingFields: {
+			type: 'array',
+			items: {
+				type: 'string',
+			},
+		},
+		confidence: {
+			type: 'number',
+			minimum: 0,
+			maximum: 1,
+		},
+	},
+
+	required: ['success', 'message', 'data', 'missingFields', 'confidence'],
+
+	additionalProperties: false,
+}
+
+const ParsedReceipt = `
 {
   "success": boolean,
   "message": string | null,
@@ -37,48 +113,53 @@ const textOutputJsonSchema = `
 /** --- Format text from image rules --- */
 
 const formatTextFromImageRules = `
-You are an expense receipt parser.
+You are a receipt parser.
 
-Input:
-- You receive raw OCR text extracted from a receipt image.
-- The text can contain line breaks, broken words, store slogans, VAT blocks, receipt IDs, addresses, duplicate labels, and recognition mistakes.
+Convert raw OCR receipt text into structured purchase data.
 
-Available categories:
-${categoriesList}
-
-Task:
-- Extract the main purchase information and return only one valid JSON object.
-- Do not return markdown, comments, explanations, or extra text.
-- If the OCR text contains enough information to create an expense record, return "success": true.
-- If the OCR text is not a receipt, is unreadable, or does not contain enough information, return "success": false.
-- "message" must explain briefly what is missing or why the receipt text cannot be parsed.
-- When "success" is true, "data" must contain the parsed expense object.
-- When "success" is false, "data" must be null.
-- If several purchased items are present, summarize them in "description".
-- Use the final paid total as "price", not VAT subtotal lines and not individual item prices.
-- Use ISO date format YYYY-MM-DD.
-- If the receipt date has a two-digit year, convert it to a four-digit year.
-- If the receipt has no reliable date, use null.
-- Detect the store name from the merchant/brand lines.
-- Detect payment method as "Card", "Cash", "Bank Transfer", "Voucher", or null.
-- Detect currency from receipt text or symbols. Use ISO currency codes such as "EUR", "GBP", "USD".
-- Set "amount" to 1 unless the receipt clearly represents multiple identical units of the same expense.
-- Choose "category" strictly from the available categories list above. Do not invent new category names. If none of the categories fit reliably, use "${fallbackCategory}".
-- Set "confidence" from 0 to 1 based on how complete and reliable the extracted data is.
-- Add names of fields you could not reliably extract to "missingFields".
-
-Output JSON schema:
-${textOutputJsonSchema}
+Today's date:
+${today}
 
 Rules:
-- The JSON must be parseable by JSON.parse.
-- Use double quotes for all JSON keys and string values.
-- Do not include trailing commas.
-- Numbers must be JSON numbers, not strings.
-- If a field is unknown, use null and include the field name in "missingFields".
-- Keep "description" short and human-readable.
-- For successful parsing, set "message" to null.
-- For failed parsing, set "success" to false, "data" to null, and "message" to a short user-facing explanation.
+
+Extract the store name, transaction date, currency, payment method, final receipt total, and all purchased items.
+Ignore VAT/tax lines, receipt IDs, addresses, payment totals, promotional text, loyalty information, and other non-purchase text.
+Do not invent information.
+
+Receipt:
+
+"store": merchant/store name.
+"date": transaction date in YYYY-MM-DD format. Convert two-digit years to four digits. If missing, use "${today}".
+"currency": ISO code such as EUR, GBP, USD.
+"paymentMethod": "Card", "Cash", "Bank Transfer", "Voucher", or null.
+"receiptTotal": final amount paid. Prefer the value associated with TOTAL. Do not use VAT, subtotal, cash tendered, change, or item prices.
+
+Items:
+
+Extract every purchased product into "items".
+One purchased product = one item object.
+Do not create items from TOTAL, VAT, payment, discount, receipt ID, address, or promotional lines.
+
+For each item:
+
+"name": product name.
+"quantity": purchased quantity. If no explicit quantity is shown, use 1.
+Never infer quantity from package descriptions. "Milk 2L", "12 Slices", and "6 Pack" normally mean quantity 1.
+"unitPrice": price of one unit.
+If quantity is 1, use the product line price.
+If quantity > 1 and the relationship is clear, use the displayed unit price or calculate line total / quantity.
+"category": exactly one category from the available categories. Categorize each product separately. If uncertain, use "${fallbackCategory}".
+
+Success:
+
+Set "success" to true if the input is a recognizable receipt and at least one purchased item was reliably extracted.
+Otherwise set "success" to false, "data" to null, and provide a short "message".
+When success is true, "message" must be null.
+
+Set "confidence" from 0 to 1 based on OCR quality and extraction reliability.
+Add uncertain or unavailable fields to "missingFields".
+
+Return only data matching the provided JSON schema.
 `
 
 /** --- Format text rules --- */
@@ -134,4 +215,4 @@ Rules:
 - For failed parsing, set "success" to false, "data" to null, and "message" to a short user-facing explanation.
 `
 
-export { formatTextFromImageRules, formatTextRules, categoriesEnum }
+export { formatTextFromImageRules, formatTextRules, jsonSchema, categoriesEnum }

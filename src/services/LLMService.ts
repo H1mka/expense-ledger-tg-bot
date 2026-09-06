@@ -1,4 +1,4 @@
-import { formatTextFromImageRules, formatTextRules } from './rules'
+import { formatTextFromImageRules, formatTextRules, jsonSchema } from './rules'
 
 const LLM_MODEL = '@cf/meta/llama-3.1-8b-instruct-fast'
 
@@ -61,7 +61,7 @@ export class LLMService {
 				messages,
 				temperature: 0.1,
 				max_tokens: 1024,
-				response_format: { type: 'json_object' },
+				response_format: { type: 'json_object', json_schema: jsonSchema },
 			})) as WorkersAiTextResponse
 
 			const response = result.response ?? result
