@@ -7,7 +7,7 @@ export async function handleTelegramWebhook(request: Request, env: Env): Promise
 	console.log('1. === Handle Telegram Webhook ===')
 
 	try {
-		const bot = createBot(env)
+		const bot = await createBot(env)
 
 		return webhookCallback(bot, 'cloudflare-mod')(request)
 	} catch (error) {

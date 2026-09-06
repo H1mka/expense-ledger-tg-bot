@@ -6,6 +6,10 @@
 		"enabled": true,
 	},
 
+	"ai": {
+		"binding": "AI",
+	},
+
 	"vars": {
 		"BOT_INFO": {
 			"id": 8627203050,
