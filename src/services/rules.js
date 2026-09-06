@@ -153,6 +153,21 @@ If quantity is 1, use the product line price.
 If quantity > 1 and the relationship is clear, use the displayed unit price or calculate line total / quantity.
 "category": exactly one category from the available categories. Categorize each product separately. If uncertain, use "${fallbackCategory}".
 
+Category rules:
+
+- Use both the product type and the merchant context when choosing a category.
+- For supermarket or grocery store receipts, food and drink products should normally be categorized as "Groceries".
+- Use "Cafe & Restaurants" only for purchases from restaurants, cafes, takeaways, bars, or similar food-service merchants.
+- A food product does NOT belong to "Cafe & Restaurants" merely because it is ready to eat.
+- Non-food supermarket products must still use their actual category.
+
+Examples:
+- Lidl + Ice Cream → Groceries
+- Lidl + Milk → Groceries
+- Lidl + Shampoo → Personal Care
+- McDonald's + Burger → Cafe & Restaurants
+- Starbucks + Coffee → Cafe & Restaurants
+
 Success:
 
 Set "success" to true if the input is a recognizable receipt and at least one purchased item was reliably extracted.
