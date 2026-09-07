@@ -16,7 +16,13 @@ const defaultCurrency = '€'
 
 const categoriesList = categoriesEnum.map((category) => `- ${category}`).join('\n')
 const fallbackCategory = categoriesEnum[categoriesEnum.length - 1]
-const today = new Date()
+const date = new Date()
+const formatter = new Intl.DateTimeFormat('ru-RU', {
+	day: '2-digit',
+	month: '2-digit',
+	year: 'numeric',
+})
+const today = formatter.format().replaceAll('.', '-')
 
 const jsonSchema = {
 	type: 'object',
@@ -35,6 +41,7 @@ const jsonSchema = {
 				},
 				date: {
 					type: 'string',
+					pattern: '^\\d{2}-\\d{2}-\\d{4}$',
 				},
 				currency: {
 					type: ['string', 'null'],
@@ -140,7 +147,7 @@ Do not invent information.
 Receipt:
 
 "store": merchant/store name.
-"date": transaction date in YYYY-MM-DD format. Convert two-digit years to four digits. If missing, use "${today}".
+"date": transaction date in DD-MM-YYYY format. Convert two-digit years to four digits. If missing, use "${today}".
 "currency": ISO code such as EUR, GBP, USD.
 "paymentMethod": "Card", "Cash", "Bank Transfer", "Voucher", or null.
 "receiptTotal": final amount paid. Prefer the value associated with TOTAL. Do not use VAT, subtotal, cash tendered, change, or item prices.
@@ -247,5 +254,67 @@ Add fields that could not be reliably determined to "missingFields".
 
 Return only data matching the provided JSON schema.
 `
+
+const test = {
+	confidence: 0.9,
+	currency: 'EUR',
+	date: '2026-08-25',
+	items: [
+		{ category: 'Food', name: 'Classic Ice Cream Sticks', quantity: 1, unitPrice: 3.59 },
+		{ category: 'Dairy', name: 'Gouda 12 Slices', quantity: 1, unitPrice: 2.89 },
+		{ category: 'Dairy', name: 'Whole Milk 2L', quantity: 1, unitPrice: 2.25 },
+		{ category: 'Snacks', name: 'Pumpkin Seeds', quantity: 1, unitPrice: 1.45 },
+		{ category: 'Personal Care', name: 'Expert Shampoo Hyaluronic', quantity: 1, unitPrice: 2.99 },
+	],
+	missingFields: [],
+	paymentMethod: 'Cash',
+	receiptTotal: 13.17,
+	store: 'LIDL',
+}
+
+const test2 = {
+	currency: 'EUR',
+	date: '1970-09-01',
+	items: [
+		{ category: 'Fish Oil', name: 'Omega-3 Fish', quantity: 2, unitPrice: 32.87 },
+		{ category: 'Vitamins', name: 'Vitamin D3, 2,000 IU, 120 Softgels', quantity: 1, unitPrice: 5.75 },
+		{ category: 'Biotin', name: 'Biotin, 5,000 mcg, 110 Capsules', quantity: 1, unitPrice: 8.38 },
+		{ category: 'Calcium', name: 'Calcium 500+ D3, 90 Tablets', quantity: 2, unitPrice: 10.66 },
+	],
+	missingFields: [],
+	paymentMethod: null,
+	receiptTotal: 57.66,
+	store: 'iHerb',
+}
+
+const test3 = {
+	confidence: 0.9,
+	currency: 'EUR',
+	date: '2026-08-25',
+	items: [
+		{ category: '🍽 Кафе и рестораны', name: 'Classic Ice Cream Sticks', quantity: 1, unitPrice: 3.59 },
+		{ category: '🛒 Продукты', name: 'Gouda 12 Slices', quantity: 1, unitPrice: 2.89 },
+		{ category: '🛒 Продукты', name: 'Whole Milk 2L', quantity: 1, unitPrice: 2.25 },
+		{ category: '🛒 Продукты', name: 'Pumpkin Seeds', quantity: 1, unitPrice: 1.45 },
+		{ category: '💊 Здоровье', name: 'Expert Shampoo Hyaluronic', quantity: 1, unitPrice: 2.99 },
+	],
+	missingFields: [],
+	paymentMethod: 'Cash',
+	receiptTotal: 13.17,
+	store: 'LIDL',
+}
+
+const text1 = {
+	receipts: [
+		{
+			currency: '€',
+			date: 'Thu Jan 01 1970 00:00:00 GMT+0000 (Coordinated Universal Time)',
+			items: [{ category: '🛒 Продукты', name: 'Мороженное', quantity: 1, unitPrice: 3.55 }],
+			paymentMethod: null,
+			receiptTotal: 3.55,
+			store: null,
+		},
+	],
+}
 
 export { formatTextFromImageRules, formatTextRules, jsonSchema, categoriesEnum }
