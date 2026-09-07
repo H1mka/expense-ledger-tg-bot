@@ -224,7 +224,7 @@ Correct obvious spelling mistakes when the intended store or product is clear.
 Receipt fields:
 
 "store": merchant/store name, or null if unknown.
-"date": YYYY-MM-DD. Understand relative dates such as "today" and "yesterday". If missing, use "${today}".
+"date": DD-MM-YYYY. Understand relative dates such as "today" and "yesterday". If missing, use "${today}".
 "currency": use the mentioned currency, otherwise "${defaultCurrency}".
 "paymentMethod": "Card", "Cash", "Bank Transfer", "Voucher", or null.
 "receiptTotal": use only if the user clearly provides the total purchase amount; otherwise null.
