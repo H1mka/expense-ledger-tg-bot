@@ -123,6 +123,12 @@ ${today}
 Available categories:
 ${categoriesList}
 
+Fallback category:
+${fallbackCategory}
+
+Default currency:
+€
+
 Rules:
 
 Extract the store name, transaction date, currency, payment method, final receipt total, and all purchased items.
@@ -183,53 +189,61 @@ Return only data matching the provided JSON schema.
 /** --- Format text rules --- */
 
 const formatTextRules = `
-You are an expense text parser.
+You are an expense parser.
 
-Input:
-- You receive any free-form text written by a user.
-- The user may describe an expense in a short, messy, informal, or incomplete way.
-- The text can be in any language.
+Convert the user's expense message into structured data matching the provided JSON schema.
+
+Today's date:
+${today}
 
 Available categories:
 ${categoriesList}
 
-Task:
-- Convert the user's text into one valid JSON object.
-- Do not return markdown, comments, explanations, or extra text.
-- If the text contains enough information to create an expense record, return "success": true.
-- If the text is nonsense, unrelated to expenses, or does not contain enough information, return "success": false.
-- "message" must explain briefly what is missing or why the text cannot be parsed.
-- When "success" is true, "data" must contain the parsed expense object.
-- When "success" is false, "data" must be null.
+Fallback category:
+${fallbackCategory}
 
-Required information for success:
-- There must be a clear expense amount or price.
-- There must be enough context to create a useful "description" or detect a "store".
-- If currency is missing but the text clearly uses a local/known default currency from application context, use it. Otherwise set currency to null and include "currency" in "missingFields".
-
-Expense data rules:
-- Use ISO date format YYYY-MM-DD.
-- If the user writes a relative date such as "today", "yesterday", or "tomorrow", use the current date only if it is provided in the application context. If no current date is provided, use null and include "date" in "missingFields".
-- If the user does not mention a date, use null and include "date" in "missingFields".
-- Detect "store" only if the user mentions a merchant, shop, restaurant, service, or place. Otherwise use null.
-- Choose "category" strictly from the available categories list above. Do not invent new category names. If none of the categories fit reliably, use "${fallbackCategory}".
-- "price" must be the total expense amount as a JSON number, not a string.
-- "amount" should be the quantity of identical units if the user clearly states it. Otherwise use 1.
-- "currency" must be an ISO currency code such as "EUR", "GBP", "USD", or null.
-- Detect payment method as "Card", "Cash", "Bank Transfer", "Voucher", or null.
-- Keep "description" short and human-readable.
-- Set "confidence" from 0 to 1 based on how complete and reliable the parsed data is.
-- Add names of fields you could not reliably extract to "missingFields".
-
-Output JSON schema:
+Default currency:
+€
 
 Rules:
-- The JSON must be parseable by JSON.parse.
-- Use double quotes for all JSON keys and string values.
-- Do not include trailing commas.
-- Numbers must be JSON numbers, not strings.
-- For successful parsing, set "message" to null.
-- For failed parsing, set "success" to false, "data" to null, and "message" to a short user-facing explanation.
+
+Extract all purchased items mentioned by the user.
+One product = one item.
+Do not invent missing information.
+Correct obvious spelling mistakes when the intended store or product is clear.
+
+Receipt fields:
+
+"store": merchant/store name, or null if unknown.
+"date": YYYY-MM-DD. Understand relative dates such as "today" and "yesterday". If missing, use "${today}".
+"currency": use the mentioned currency, otherwise "${defaultCurrency}".
+"paymentMethod": "Card", "Cash", "Bank Transfer", "Voucher", or null.
+"receiptTotal": use only if the user clearly provides the total purchase amount; otherwise null.
+
+Item fields:
+
+"name": clean product name.
+"quantity": purchased quantity; default to 1.
+Do not confuse package size with quantity. "Milk 2L" means quantity 1.
+"unitPrice": price for one unit.
+If multiple units are bought for one combined price, calculate unitPrice when unambiguous.
+"category": exactly one available category. Categorize the product itself, using the merchant only as context.
+
+Category rules:
+
+Supermarket food and drinks → Groceries.
+Restaurant, cafe, takeaway or bar purchases → Cafe & Restaurants.
+Shampoo, soap, toothpaste, cosmetics and hygiene products → Personal Care.
+Clothes means clothing, footwear and wearable accessories.
+If uncertain, use "${fallbackCategory}".
+
+Set "success" to true if at least one expense item can be reliably identified.
+Otherwise set "success" to false and "data" to null.
+
+Set "confidence" from 0 to 1.
+Add fields that could not be reliably determined to "missingFields".
+
+Return only data matching the provided JSON schema.
 `
 
 export { formatTextFromImageRules, formatTextRules, jsonSchema, categoriesEnum }
