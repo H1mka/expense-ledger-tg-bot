@@ -12,6 +12,8 @@ const categoriesEnum = [
 	'📦 Другое',
 ]
 
+const defaultCurrency = '€'
+
 const categoriesList = categoriesEnum.map((category) => `- ${category}`).join('\n')
 const fallbackCategory = categoriesEnum[categoriesEnum.length - 1]
 const today = new Date()
@@ -127,7 +129,7 @@ Fallback category:
 ${fallbackCategory}
 
 Default currency:
-€
+${defaultCurrency}
 
 Rules:
 
@@ -203,7 +205,7 @@ Fallback category:
 ${fallbackCategory}
 
 Default currency:
-€
+${defaultCurrency}
 
 Rules:
 
