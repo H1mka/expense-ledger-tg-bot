@@ -34,12 +34,12 @@ export const registerPhotoHandler = (bot: Bot, env: Env) => {
 		const googleVision = new GoogleVisionService(env.GOOGLE_VISION_API_KEY)
 		const textArray = await googleVision.parseImageToText(base64)
 		console.log('TEXT RECOGNIZE RESULT', JSON.stringify(textArray))
-		await ctx.reply(`TEXT RECOGNIZE RESULT $${JSON.stringify(textArray)}`)
+		await ctx.reply(`TEXT RECOGNIZE RESULT ${JSON.stringify(textArray)}`)
 		// await ctx.replyWithPhoto(photo.file_id, { caption: 'This is your photo' })
 
 		// Text formatter with ai
 		const llmService = new LLMService(env.AI)
-		const response = await llmService.formatImageText(textArray)
+		const response = await llmService.processImageToText(textArray)
 
 		if (!response || !response.success) {
 			await ctx.reply(`⛔️ Something went wrong: ${JSON.stringify(response?.message)}`)
