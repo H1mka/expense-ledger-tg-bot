@@ -27,77 +27,52 @@ const today = formatter.format().replaceAll('.', '-')
 const jsonSchema = {
 	type: 'object',
 	properties: {
-		// success: {
-		// 	type: 'boolean',
-		// },
-		// message: {
-		// 	type: ['string', 'null'],
-		// },
-		// data: {
-		// type: ['object', 'null'],
-		properties: {
-			store: {
-				type: ['string', 'null'],
-			},
-			date: {
-				type: 'string',
-				pattern: '^\\d{2}-\\d{2}-\\d{4}$',
-			},
-			currency: {
-				type: ['string', 'null'],
-			},
-			paymentMethod: {
-				enum: ['Card', 'Cash', 'Bank Transfer', 'Voucher', null],
-			},
-			receiptTotal: {
-				type: ['number', 'null'],
-				minimum: 0,
-			},
+		store: {
+			type: ['string', 'null'],
+		},
+		date: {
+			type: 'string',
+			pattern: '^\\d{2}-\\d{2}-\\d{4}$',
+		},
+		currency: {
+			type: ['string', 'null'],
+		},
+		paymentMethod: {
+			enum: ['Card', 'Cash', 'Bank Transfer', 'Voucher', null],
+		},
+		receiptTotal: {
+			type: ['number', 'null'],
+			minimum: 0,
+		},
+		items: {
+			type: 'array',
+			description: 'An array that contains receipt items',
 			items: {
-				type: 'array',
-				items: {
-					type: 'object',
-					properties: {
-						name: {
-							type: 'string',
-						},
-						quantity: {
-							type: 'number',
-							exclusiveMinimum: 0,
-						},
-						unitPrice: {
-							type: ['number', 'null'],
-							minimum: 0,
-						},
-						category: {
-							type: 'string',
-							enum: categoriesEnum,
-						},
+				type: 'object',
+				properties: {
+					name: {
+						type: 'string',
 					},
-					required: ['name', 'quantity', 'unitPrice', 'category'],
-					additionalProperties: false,
+					quantity: {
+						type: 'number',
+						exclusiveMinimum: 0,
+					},
+					unitPrice: {
+						type: ['number', 'null'],
+						minimum: 0,
+					},
+					category: {
+						type: 'string',
+						enum: categoriesEnum,
+					},
 				},
+				required: ['name', 'quantity', 'unitPrice', 'category'],
+				additionalProperties: false,
 			},
 		},
 		required: ['store', 'date', 'currency', 'paymentMethod', 'receiptTotal', 'items'],
 		additionalProperties: false,
-		// },
-		// missingFields: {
-		// 	type: 'array',
-		// 	items: {
-		// 		type: 'string',
-		// 	},
-		// },
-		// confidence: {
-		// 	type: 'number',
-		// 	minimum: 0,
-		// 	maximum: 1,
-		// },
 	},
-
-	// required: ['success', 'message', 'data', 'missingFields', 'confidence'],
-
-	// additionalProperties: false,
 }
 
 const ParsedReceipt = `
