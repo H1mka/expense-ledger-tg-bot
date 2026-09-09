@@ -171,7 +171,7 @@ If quantity > 1 and the relationship is clear, use the displayed unit price or c
 Category rules:
 
 - Use both the product type and the merchant context when choosing a category.
-- For supermarket or grocery store receipts, food and drink products should normally be categorized as "Groceries".
+- For supermarket or grocery store receipt, food and drink products should normally be categorized as "Groceries".
 - Use "Cafe & Restaurants" only for purchases from restaurants, cafes, takeaways, bars, or similar food-service merchants.
 - A food product does NOT belong to "Cafe & Restaurants" merely because it is ready to eat.
 - Non-food supermarket products must still use their actual category.
