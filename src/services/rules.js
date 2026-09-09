@@ -27,53 +27,69 @@ const today = formatter.format().replaceAll('.', '-')
 const jsonSchema = {
 	type: 'object',
 	properties: {
-		store: {
-			type: ['string', 'null'],
-		},
-		date: {
+		text: {
+			description: 'Short text about receipt',
 			type: 'string',
-			pattern: '^\\d{2}-\\d{2}-\\d{4}$',
 		},
-		currency: {
-			type: ['string', 'null'],
+		success: {
+			description: 'Booleand value about operation status',
+			type: 'boolean',
 		},
-		paymentMethod: {
-			enum: ['Card', 'Cash', 'Bank Transfer', 'Voucher', null],
-		},
-		receiptTotal: {
-			type: ['number', 'null'],
-			minimum: 0,
-		},
-		items: {
-			type: 'array',
-			description: 'An array that contains receipt items',
-			items: {
-				type: 'object',
-				properties: {
-					name: {
-						type: 'string',
-					},
-					quantity: {
-						type: 'number',
-						exclusiveMinimum: 0,
-					},
-					unitPrice: {
-						type: ['number', 'null'],
-						minimum: 0,
-					},
-					category: {
-						type: 'string',
-						enum: categoriesEnum,
-					},
-				},
-				required: ['name', 'quantity', 'unitPrice', 'category'],
-				additionalProperties: false,
-			},
-		},
-		required: ['store', 'date', 'currency', 'paymentMethod', 'receiptTotal', 'items'],
-		additionalProperties: false,
 	},
+	required: ['text', 'success'],
+	additionalProperties: false,
 }
+
+// const jsonSchema = {
+// 	type: 'object',
+// 	properties: {
+// 		store: {
+// 			type: ['string', 'null'],
+// 		},
+// 		date: {
+// 			type: 'string',
+// 			pattern: '^\\d{2}-\\d{2}-\\d{4}$',
+// 		},
+// 		currency: {
+// 			type: ['string', 'null'],
+// 		},
+// 		paymentMethod: {
+// 			enum: ['Card', 'Cash', 'Bank Transfer', 'Voucher', null],
+// 		},
+// 		receiptTotal: {
+// 			type: ['number', 'null'],
+// 			minimum: 0,
+// 		},
+// 		items: {
+// 			type: 'array',
+// 			description: 'An array that contains receipt items',
+// 			items: {
+// 				type: 'object',
+// 				properties: {
+// 					name: {
+// 						type: 'string',
+// 					},
+// 					quantity: {
+// 						type: 'number',
+// 						exclusiveMinimum: 0,
+// 					},
+// 					unitPrice: {
+// 						type: ['number', 'null'],
+// 						minimum: 0,
+// 					},
+// 					category: {
+// 						type: 'string',
+// 						enum: categoriesEnum,
+// 					},
+// 				},
+// 				required: ['name', 'quantity', 'unitPrice', 'category'],
+// 				additionalProperties: false,
+// 			},
+// 		},
+// 		required: ['store', 'date', 'currency', 'paymentMethod', 'receiptTotal', 'items'],
+// 		additionalProperties: false,
+// 	},
+// }
 
 const ParsedReceipt = `
 {
