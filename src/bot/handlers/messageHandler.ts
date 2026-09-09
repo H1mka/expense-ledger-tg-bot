@@ -11,7 +11,7 @@ export const handleTextMessages = (bot: Bot, env: Env) => {
 		if (!userText) return
 
 		const llmService = new LLMService(env.AI)
-		const response = await llmService.formatText(userText)
+		const response = await llmService.processText(userText)
 
 		if (!response || !response.success) {
 			await ctx.reply(`⛔️ Something went wrong: ${JSON.stringify(response?.message)}`)

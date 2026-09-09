@@ -40,13 +40,13 @@ type WorkersAiMessage = {
 export class LLMService {
 	constructor(private readonly ai: Ai) {}
 
-	async formatImageText(textFromImage: string | Array<string>): Promise<TextParseOutput> {
+	async processImageToText(textFromImage: string | Array<string>): Promise<TextParseOutput> {
 		const stringifyText = JSON.stringify(textFromImage)
 
 		return this.generateJson<NonNullable<TextParseOutput>>(formatTextFromImageRules, stringifyText)
 	}
 
-	async formatText(userText: string): Promise<TextParseOutput> {
+	async processText(userText: string): Promise<TextParseOutput> {
 		return this.generateJson<NonNullable<TextParseOutput>>(formatTextRules, userText)
 	}
 
@@ -61,7 +61,7 @@ export class LLMService {
 				messages,
 				temperature: 0.1,
 				max_tokens: 1024,
-				response_format: { type: 'json_object', json_schema: jsonSchema },
+				response_format: { type: 'json_schema', json_schema: jsonSchema },
 			})) as WorkersAiTextResponse
 
 			const response = result.response ?? result
