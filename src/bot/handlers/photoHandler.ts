@@ -5,6 +5,7 @@ import { LLMService } from '../../services/LLMService'
 import { GoogleVisionService } from '../../services/GoogleVisionService'
 
 import { downloadTelegramPhoto, arrayBufferToBase64, type TelegramPhotoResult } from '../../utils/imageHelper'
+import { getReceiptInfoTemplate } from '../../utils/expenseTextHelper'
 
 export const registerPhotoHandler = (bot: Bot, env: Env) => {
 	console.log('=== Register photo handler ===')
@@ -41,11 +42,13 @@ export const registerPhotoHandler = (bot: Bot, env: Env) => {
 		const llmService = new LLMService(env.AI)
 		const response = await llmService.processImageToText(textArray)
 
-		if (!response || !response.success) {
-			await ctx.reply(`⛔️ Something went wrong: ${JSON.stringify(response?.message)}`)
+		if (!response) {
+			await ctx.reply(`⛔️ Something went wrong`)
 			return
 		}
 
-		await ctx.reply(`Json format ${JSON.stringify(response.data)}`)
+		const receiptTemplate = getReceiptInfoTemplate(response)
+
+		await ctx.reply(receiptTemplate)
 	})
 }

@@ -1,32 +1,9 @@
 import { formatTextFromImageRules, formatTextRules, jsonSchema } from './rules'
+import { ExpenseData } from './types'
 
 const LLM_MODEL = '@cf/meta/llama-3.1-8b-instruct-fast'
 
-type ExpenseData = {
-	date: string | null
-	store: string | null
-	category: string | null
-	price: number | null
-	amount: number
-	currency: string | null
-	description: string | null
-	paymentMethod: string | null
-	confidence: number
-	missingFields: string[]
-}
-
-type TextParseOutput =
-	| {
-			success: true
-			message: null
-			data: ExpenseData
-	  }
-	| {
-			success: false
-			message: string
-			data: null
-	  }
-	| null
+type TextParseOutput = ExpenseData | null
 
 type WorkersAiTextResponse = {
 	response?: unknown

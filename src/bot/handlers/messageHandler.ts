@@ -1,6 +1,7 @@
 import { Bot, Context } from 'grammy'
 import { LLMService } from '../../services/LLMService'
 import { Env } from '../../index'
+import { getReceiptInfoTemplate } from '../../utils/expenseTextHelper'
 
 export const handleTextMessages = (bot: Bot, env: Env) => {
 	console.log('=== Register handle Text Messages ===')
@@ -13,11 +14,13 @@ export const handleTextMessages = (bot: Bot, env: Env) => {
 		const llmService = new LLMService(env.AI)
 		const response = await llmService.processText(userText)
 
-		if (!response || !response.success) {
-			await ctx.reply(`⛔️ Something went wrong: ${JSON.stringify(response?.message)}`)
+		if (!response) {
+			await ctx.reply(`⛔️ Something went wrong`)
 			return
 		}
 
-		await ctx.reply(`Json format ${JSON.stringify(response)}`)
+		const receiptTemplate = getReceiptInfoTemplate(response)
+
+		await ctx.reply(receiptTemplate)
 	})
 }
