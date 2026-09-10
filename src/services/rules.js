@@ -99,6 +99,7 @@ const jsonSchema = {
 	properties: {
 		store: {
 			type: ['string', 'null'],
+			maxLength: 24,
 			description: 'Name of the store or merchant where the purchase was made. Return null if it cannot be identified.',
 		},
 

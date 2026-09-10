@@ -35,7 +35,7 @@ const getReceiptItemsTemplate = (receiptItems: Array<ExpenseItem>) => {
 		return `
       ${category}
       
-      ${itemsText}
+      \t${itemsText}
     `
 	})
 	// return receiptItems.map((item) => `• ${item.name} — ${item.quantity} x ${item.unitPrice}`).join('\n')
@@ -48,13 +48,13 @@ const getReceiptInfoTemplate = (data: ExpenseData): string => {
 
 	return `
 		<b>🧾 Чек</b>
-		━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+		━━━━━━━━━━━━━━━
     📅 ${date}
     🏪 ${store}
 
     ${receiptItems}
 
-		━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+		━━━━━━━━━━━━━━━
     💳 Оплата: ${paymentMethod}
     💰 Сумма: <b>${currency}${receiptTotal}</b>
   `
