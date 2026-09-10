@@ -35,6 +35,10 @@ const jsonSchema = {
 			description: 'Booleand value about operation status',
 			type: 'boolean',
 		},
+		isStoreLidl: {
+			description: 'Define boolean value, set true if store equals Lidl',
+			type: ['boolean', 'null'],
+		},
 	},
 	required: ['text', 'success'],
 	additionalProperties: false,

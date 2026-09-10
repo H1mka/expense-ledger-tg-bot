@@ -18,6 +18,6 @@ export const handleTextMessages = (bot: Bot, env: Env) => {
 			return
 		}
 
-		await ctx.reply(`Json format ${JSON.stringify(response.data)}`)
+		await ctx.reply(`Json format ${JSON.stringify(response)}`)
 	})
 }
