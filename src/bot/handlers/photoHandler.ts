@@ -49,6 +49,6 @@ export const registerPhotoHandler = (bot: Bot, env: Env) => {
 
 		const receiptTemplate = getReceiptInfoTemplate(response)
 
-		await ctx.reply(receiptTemplate)
+		await ctx.reply(receiptTemplate, { parse_mode: 'HTML' })
 	})
 }
