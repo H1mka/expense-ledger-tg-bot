@@ -25,14 +25,17 @@ const getReceiptItemsTemplate = (receiptItems: Array<ExpenseItem>) => {
 
 	return Object.keys(groupedItems).map((category) => {
 		const values = groupedItems[category]
-		const itemsText = values.map((item) => `• ${item.name} — ${item.quantity} x ${item.unitPrice}`).join('\n')
+		const itemsText = values
+			.map(
+				(item) => `
+					• ${item.name} — ${item.quantity} x ${item.unitPrice}`,
+			)
+			.join('\n')
 
 		return `
       ${category}
       
       ${itemsText}
-
-      --------------------------------\n
     `
 	})
 	// return receiptItems.map((item) => `• ${item.name} — ${item.quantity} x ${item.unitPrice}`).join('\n')
@@ -43,14 +46,17 @@ const getReceiptInfoTemplate = (data: ExpenseData): string => {
 
 	const receiptItems = getReceiptItemsTemplate(items)
 
-	return `🧾 Чек
-    📅 Дата: ${date}
-    🏪 Магазин: $${store}
+	return `
+		<b>🧾 Чек</b>
+		━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    📅 ${date}
+    🏪 ${store}
 
     ${receiptItems}
 
+		━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     💳 Оплата: ${paymentMethod}
-    💰 Сумма: ${currency}${receiptTotal}
+    💰 Сумма: <b>${currency}${receiptTotal}</b>
   `
 }
 
