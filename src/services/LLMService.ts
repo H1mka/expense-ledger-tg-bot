@@ -60,7 +60,7 @@ export class LLMService {
 			const result = (await this.ai.run(LLM_MODEL, {
 				messages,
 				temperature: 0.1,
-				max_tokens: 1024,
+				max_tokens: 4096,
 				response_format: { type: 'json_schema', json_schema: jsonSchema },
 			})) as WorkersAiTextResponse
 

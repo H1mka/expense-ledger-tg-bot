@@ -24,25 +24,25 @@ const formatter = new Intl.DateTimeFormat('ru-RU', {
 })
 const today = formatter.format().replaceAll('.', '-')
 
-const jsonSchema = {
-	type: 'object',
-	properties: {
-		text: {
-			description: 'Short text about receipt',
-			type: 'string',
-		},
-		success: {
-			description: 'Booleand value about operation status',
-			type: 'boolean',
-		},
-		isStoreLidl: {
-			description: 'Define boolean value, set true if store equals Lidl',
-			type: ['boolean', 'null'],
-		},
-	},
-	required: ['text', 'success'],
-	additionalProperties: false,
-}
+// const jsonSchema = {
+// 	type: 'object',
+// 	properties: {
+// 		text: {
+// 			description: 'Short text about receipt',
+// 			type: 'string',
+// 		},
+// 		success: {
+// 			description: 'Booleand value about operation status',
+// 			type: 'boolean',
+// 		},
+// 		isStoreLidl: {
+// 			description: 'Define boolean value, set true if store equals Lidl',
+// 			type: ['boolean', 'null'],
+// 		},
+// 	},
+// 	required: ['text', 'success'],
+// 	additionalProperties: false,
+// }
 
 // const jsonSchema = {
 // 	type: 'object',
@@ -94,6 +94,80 @@ const jsonSchema = {
 // 		additionalProperties: false,
 // 	},
 // }
+const jsonSchema = {
+	type: 'object',
+	properties: {
+		store: {
+			type: ['string', 'null'],
+			description: 'Name of the store or merchant where the purchase was made. Return null if it cannot be identified.',
+		},
+
+		date: {
+			type: 'string',
+			pattern: '^\\d{2}-\\d{2}-\\d{4}$',
+			description:
+				'Purchase date in DD-MM-YYYY format. Use the date explicitly found in the receipt or user message. For relative dates such as today or yesterday, resolve them using the current date provided in the prompt.',
+		},
+
+		currency: {
+			type: ['string', 'null'],
+			description:
+				'Currency used for the purchase, preferably as a standard currency code such as EUR, USD or GBP. Return null if unknown.',
+		},
+
+		paymentMethod: {
+			enum: ['Card', 'Cash', 'Bank Transfer', 'Voucher', null],
+			description: 'Payment method used for the purchase. Return null when the payment method cannot be reliably determined.',
+		},
+
+		receiptTotal: {
+			type: ['number', 'null'],
+			minimum: 0,
+			description:
+				'Final total amount paid for the purchase. Do not confuse it with change, cashback, deposit amounts, individual item totals, or subtotal. Return null if the final total cannot be reliably identified.',
+		},
+
+		items: {
+			type: 'array',
+			description: 'List of all purchased products or services. Each distinct purchased product must be represented as a separate item.',
+			items: {
+				type: 'object',
+				properties: {
+					name: {
+						type: 'string',
+						description:
+							'Clean product name. Preserve the intended product name while correcting obvious OCR or spelling errors. Do not include the price or quantity in the name.',
+					},
+
+					quantity: {
+						type: 'number',
+						exclusiveMinimum: 0,
+						description:
+							'Number of units purchased. Default to 1 when only one unit is indicated. Do not treat package size or volume as quantity: for example, "Milk 2L" means quantity 1.',
+					},
+
+					unitPrice: {
+						type: ['number', 'null'],
+						minimum: 0,
+						description:
+							'Price of one purchased unit. If multiple identical units have a combined price, calculate the unit price when the quantity and total price are clear. Return null if the unit price cannot be reliably determined.',
+					},
+
+					category: {
+						type: 'string',
+						enum: categoriesEnum,
+						description:
+							'Category of the purchased product. Classify the product itself, using the merchant as context. For example, packaged food bought at a supermarket is groceries, not a restaurant purchase.',
+					},
+				},
+				required: ['name', 'quantity', 'unitPrice', 'category'],
+				additionalProperties: false,
+			},
+		},
+	},
+	required: ['store', 'date', 'currency', 'paymentMethod', 'receiptTotal', 'items'],
+	additionalProperties: false,
+}
 
 const ParsedReceipt = `
 {
