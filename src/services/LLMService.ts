@@ -71,6 +71,8 @@ export class LLMService {
 				throw new Error('Workers AI returned an empty response')
 			}
 
+			console.log('\n\n\n LLM response: \n\n\n', response, typeof response)
+
 			return this.parseJsonResponse<T>(response)
 		} catch (error) {
 			console.error('Error with LLM Service', error)
